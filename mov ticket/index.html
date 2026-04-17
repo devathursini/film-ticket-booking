@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineVerse — Book Movie Tickets Online</title>
+    <meta name="description"
+        content="Book movie tickets online at CineVerse. Browse now showing movies, select seats, and pay securely with UPI or card.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=3">
+</head>
+
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="navigate('home')">
+                <i class="fas fa-film" style="color:var(--accent)"></i> <span style="color:#ffffff">Cine</span><span
+                    style="color:var(--accent)">Verse</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#" onclick="navigate('home')" class="nav-link active" data-page="home"><i
+                        class="fas fa-home"></i> Home</a>
+                <a href="#" onclick="navigate('movies')" class="nav-link" data-page="movies"><i
+                        class="fas fa-video"></i> Movies</a>
+                <a href="#" onclick="navigate('my-bookings')" class="nav-link" data-page="my-bookings"><i
+                        class="fas fa-ticket-alt"></i> My Bookings</a>
+            </div>
+            <div class="nav-right">
+                <div class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-avatar" onclick="toggleUserDropdown()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userDisplayName">User</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" onclick="navigate('my-bookings')"><i class="fas fa-ticket-alt"></i> My Bookings</a>
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== AUTH PAGE ===== -->
+    <section class="page auth-page" id="page-auth">
+        <div class="auth-bg">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <i class="fas fa-film auth-logo-icon" style="color:var(--accent)"></i>
+                    <h1><span style="color:#ffffff">Cine</span><span style="color:var(--accent)">Verse</span></h1>
+                    <p>Your Premium Movie Experience</p>
+                </div>
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+                    <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+                </div>
+                <!-- Login Form -->
+                <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <p class="auth-switch">Don't have an account? <a href="#" onclick="switchAuthTab('signup')">Sign
+                            Up</a></p>
+                </form>
+                <!-- Signup Form -->
+                <form class="auth-form" id="signupForm" style="display:none;" onsubmit="handleSignup(event)">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signupName" placeholder="Full Name" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="signupEmail" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="signupPhone" placeholder="Phone Number" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPassword" placeholder="Password (min 6 chars)" minlength="6"
+                            required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupConfirm" placeholder="Confirm Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                    <p class="auth-switch">Already have an account? <a href="#"
+                            onclick="switchAuthTab('login')">Login</a></p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== HOME PAGE ===== -->
+    <section class="page" id="page-home" style="display:none;">
+        <!-- Hero Carousel -->
+        <div class="hero" id="heroBanner">
+            <div id="heroSlides" class="hero-slides">
+                <!-- Slides will be injected here by JS -->
+                <div class="hero-placeholder">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <!-- Carousel Navigation -->
+            <div class="hero-nav">
+                <button class="hero-nav-btn prev" onclick="moveHero(-1)"><i class="fas fa-chevron-left"></i></button>
+                <div class="hero-dots" id="heroDots"></div>
+                <button class="hero-nav-btn next" onclick="moveHero(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Now Showing -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-fire"></i> Now Showing</h2>
+                <a href="#" onclick="navigate('movies')" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="movie-grid" id="nowShowingGrid">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading movies...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-clock"></i> Coming Soon</h2>
+            </div>
+            <div class="movie-scroll" id="upcomingScroll">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Rated -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-trophy"></i> Top Rated</h2>
+            </div>
+            <div class="movie-scroll" id="topRatedScroll">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MOVIES PAGE ===== -->
+    <section class="page" id="page-movies" style="display:none;">
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-video"></i> All Movies</h2>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="movieSearch" placeholder="Search movies..." oninput="filterMovies()">
+            </div>
+            <div class="genre-filters" id="genreFilters"></div>
+            <div class="movie-grid" id="allMoviesGrid">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading movies...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MOVIE DETAIL PAGE ===== -->
+    <section class="page" id="page-movie-detail" style="display:none;">
+        <div class="detail-backdrop" id="detailBackdrop"></div>
+        <div class="detail-container">
+            <div class="detail-header">
+                <img id="detailPoster" class="detail-poster" src="" alt="">
+                <div class="detail-info">
+                    <h1 id="detailTitle"></h1>
+                    <div class="detail-meta">
+                        <span class="badge badge-rating" id="detailRating"><i class="fas fa-star"></i></span>
+                        <span class="badge" id="detailYear"><i class="fas fa-calendar"></i></span>
+                        <span class="badge" id="detailLang"><i class="fas fa-globe"></i></span>
+                        <span class="badge" id="detailRuntime"><i class="fas fa-clock"></i></span>
+                    </div>
+                    <div class="detail-genres" id="detailGenres"></div>
+                    <p class="detail-overview" id="detailOverview"></p>
+                    <div class="detail-actions">
+                        <button class="btn btn-primary btn-glow" id="detailBookBtn" onclick="showTimings()">
+                            <i class="fas fa-ticket-alt"></i> Book Tickets
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Show Timings -->
+            <div class="show-timings-section" id="showTimingsSection" style="display:none;">
+                <h2><i class="fas fa-clock"></i> Select Show Time</h2>
+                <div class="date-selector" id="dateSelector"></div>
+                <div class="theatres-list" id="theatresList"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SEAT SELECTION PAGE ===== -->
+    <section class="page" id="page-seats" style="display:none;">
+        <div class="seats-container">
+            <div class="seats-header">
+                <h2 id="seatsMovieTitle"></h2>
+                <p id="seatsShowInfo"></p>
+            </div>
+            <div class="screen-container">
+                <div class="screen">
+                    <span>SCREEN</span>
+                </div>
+            </div>
+            <div class="seat-legend">
+                <div class="legend-item">
+                    <div class="seat-demo available"></div> Available
+                </div>
+                <div class="legend-item">
+                    <div class="seat-demo selected"></div> Selected
+                </div>
+                <div class="legend-item">
+                    <div class="seat-demo booked"></div> Booked
+                </div>
+                <div class="legend-item">
+                    <div class="seat-demo premium-demo"></div> Premium ₹200
+                </div>
+                <div class="legend-item">
+                    <div class="seat-demo standard-demo"></div> Standard ₹150
+                </div>
+                <div class="legend-item">
+                    <div class="seat-demo economy-demo"></div> Economy ₹100
+                </div>
+            </div>
+            <div class="seat-map" id="seatMap"></div>
+            <div class="booking-summary" id="bookingSummary">
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span>Selected Seats:</span>
+                        <span id="selectedSeatsText">None</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Total Amount:</span>
+                        <span id="totalAmount" class="total-price">₹0</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-glow" id="proceedPayBtn" onclick="proceedToPayment()" disabled>
+                    <i class="fas fa-arrow-right"></i> Proceed to Pay
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PAYMENT PAGE ===== -->
+    <section class="page" id="page-payment" style="display:none;">
+        <div class="payment-container">
+            <div class="payment-left">
+                <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+                <div class="order-card">
+                    <div class="order-movie">
+                        <img id="paymentPoster" src="" alt="">
+                        <div>
+                            <h3 id="paymentMovieTitle"></h3>
+                            <p id="paymentShowInfo"></p>
+                            <p id="paymentSeats"></p>
+                        </div>
+                    </div>
+                    <div class="order-breakdown">
+                        <div class="order-row"><span>Ticket Price</span><span id="orderTicketPrice">₹0</span></div>
+                        <div class="order-row"><span>Convenience Fee</span><span id="orderConvFee">₹0</span></div>
+                        <div class="order-row"><span>GST (18%)</span><span id="orderGST">₹0</span></div>
+                        <hr>
+                        <div class="order-row total"><span>Total</span><span id="orderTotal">₹0</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="payment-right">
+                <h2><i class="fas fa-credit-card"></i> Payment Method</h2>
+                <div class="payment-methods">
+                    <div class="payment-option active" onclick="selectPayment('upi')" id="payOptUPI">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>UPI Payment</span>
+                        <small>Google Pay, PhonePe, Paytm</small>
+                    </div>
+                    <div class="payment-option" onclick="selectPayment('card')" id="payOptCard">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Credit / Debit Card</span>
+                        <small>Visa, Mastercard, RuPay</small>
+                    </div>
+                    <div class="payment-option" onclick="selectPayment('netbanking')" id="payOptNet">
+                        <i class="fas fa-university"></i>
+                        <span>Net Banking</span>
+                        <small>All major banks</small>
+                    </div>
+                </div>
+
+                <!-- UPI Form with QR Code -->
+                <div class="payment-form" id="payFormUPI">
+                    <div class="upi-qr-section">
+                        <h3 style="text-align:center; margin-bottom:10px; color:var(--text-primary);">Scan QR to Pay
+                        </h3>
+                        <div class="upi-qr-wrapper" id="upiQRCode"></div>
+                        <div class="upi-info-box">
+                            <div class="upi-info-row">
+                                <span class="upi-info-label">UPI ID:</span>
+                                <span class="upi-info-value" id="upiIdDisplay">Loading...</span>
+                            </div>
+                            <div class="upi-info-row">
+                                <span class="upi-info-label">Amount:</span>
+                                <span class="upi-info-value upi-amount" id="upiAmountDisplay">₹0</span>
+                            </div>
+                        </div>
+                        <p style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin:8px 0;">Scan this
+                            QR code with any UPI app to pay</p>
+                        <div class="upi-apps">
+                            <p>Or pay directly with</p>
+                            <div class="upi-app-grid">
+                                <div class="upi-app" onclick="selectUPIApp('Google Pay')"><i
+                                        class="fab fa-google-pay"></i><span>GPay</span></div>
+                                <div class="upi-app" onclick="selectUPIApp('PhonePe')"><i
+                                        class="fas fa-mobile-alt"></i><span>PhonePe</span></div>
+                                <div class="upi-app" onclick="selectUPIApp('Paytm')"><i
+                                        class="fas fa-wallet"></i><span>Paytm</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Form -->
+                <div class="payment-form" id="payFormCard" style="display:none;">
+                    <div class="input-group">
+                        <i class="fas fa-credit-card"></i>
+                        <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19"
+                            oninput="formatCardNumber(this)">
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <i class="fas fa-calendar"></i>
+                            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5"
+                                oninput="formatExpiry(this)">
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="cardCVV" placeholder="CVV" maxlength="3">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="cardName" placeholder="Name on Card">
+                    </div>
+                </div>
+
+                <!-- NetBanking Form -->
+                <div class="payment-form" id="payFormNet" style="display:none;">
+                    <div class="bank-grid">
+                        <div class="bank-option" onclick="selectBank(this, 'SBI')"><i class="fas fa-university"></i> SBI
+                        </div>
+                        <div class="bank-option" onclick="selectBank(this, 'HDFC')"><i class="fas fa-university"></i>
+                            HDFC</div>
+                        <div class="bank-option" onclick="selectBank(this, 'ICICI')"><i class="fas fa-university"></i>
+                            ICICI</div>
+                        <div class="bank-option" onclick="selectBank(this, 'Axis')"><i class="fas fa-university"></i>
+                            Axis</div>
+                        <div class="bank-option" onclick="selectBank(this, 'Kotak')"><i class="fas fa-university"></i>
+                            Kotak</div>
+                        <div class="bank-option" onclick="selectBank(this, 'PNB')"><i class="fas fa-university"></i> PNB
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-glow pay-btn" onclick="processPayment()">
+                    <i class="fas fa-lock"></i> Pay <span id="payBtnAmount">₹0</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PAYMENT PROCESSING OVERLAY ===== -->
+    <div class="payment-processing" id="paymentProcessing" style="display:none;">
+        <div class="processing-card">
+            <div class="processing-spinner"></div>
+            <h2>Processing Payment...</h2>
+            <p>Please do not close this window</p>
+        </div>
+    </div>
+
+    <!-- ===== TICKET / CONFIRMATION PAGE ===== -->
+    <section class="page" id="page-ticket" style="display:none;">
+        <div class="ticket-container">
+            <div class="confetti" id="confetti"></div>
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Booking Confirmed! 🎉</h2>
+            <p class="success-sub">Your tickets have been booked successfully</p>
+
+            <div class="ticket-card" id="ticketCard">
+                <div class="ticket-poster-container">
+                    <img id="ticketPoster" src="" alt="Movie Poster" crossorigin="anonymous">
+                </div>
+                <div class="ticket-info">
+                    <div class="ticket-top">
+                        <div class="ticket-brand"><i class="fas fa-film"></i> CineVerse</div>
+                        <div class="ticket-qr" id="ticketQR"></div>
+                    </div>
+                    <div class="ticket-divider">
+                        <div class="ticket-notch left"></div>
+                        <div class="ticket-notch right"></div>
+                    </div>
+                    <div class="ticket-bottom">
+                        <h3 id="ticketMovieName"></h3>
+                        <div class="ticket-details">
+                            <div><small>Date</small><span id="ticketDate"></span></div>
+                            <div><small>Time</small><span id="ticketTime"></span></div>
+                            <div><small>Screen</small><span id="ticketScreen"></span></div>
+                        </div>
+                        <div class="ticket-details">
+                            <div><small>Seats</small><span id="ticketSeats"></span></div>
+                            <div><small>Amount Paid</small><span id="ticketAmount"></span></div>
+                            <div><small>Booking ID</small><span id="ticketBookingId"></span></div>
+                        </div>
+                        <div class="ticket-details">
+                            <div><small>Theatre</small><span id="ticketTheatre"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-actions">
+                <button class="btn btn-primary btn-glow" onclick="downloadTicket()">
+                    <i class="fas fa-download"></i> Download Ticket
+                </button>
+                <button class="btn btn-secondary" onclick="navigate('home')">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MY BOOKINGS PAGE ===== -->
+    <section class="page" id="page-my-bookings" style="display:none;">
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-ticket-alt"></i> My Bookings</h2>
+            </div>
+            <div id="bookingsContainer" class="bookings-grid"></div>
+        </div>
+    </section>
+
+    <!-- ===== ADMIN LOGIN PAGE ===== -->
+    <section class="page auth-page" id="page-admin-login" style="display:none;">
+        <div class="auth-bg">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <i class="fas fa-user-shield auth-logo-icon" style="color:var(--accent)"></i>
+                    <h1><span style="color:#ffffff">Admin</span><span style="color:var(--accent)">Portal</span></h1>
+                    <p>Secure Administrator Access Only</p>
+                </div>
+                <!-- Admin Login Form -->
+                <form class="auth-form" id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="adminUsername" placeholder="Username" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="adminPassword" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i> Login as Admin
+                    </button>
+                    <p class="auth-switch"><a href="#" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Back
+                            to Home</a></p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TOAST NOTIFICATION ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== ADMIN PAGE ===== -->
+    <section class="page" id="page-admin" style="display:none;">
+        <div class="section">
+            <div class="section-header">
+                <div style="display:flex; align-items:center; gap:15px; width:100%; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
+                        <div class="admin-tabs">
+                            <button class="admin-tab active" onclick="switchAdminTab('movies')">Movies
+                                Management</button>
+                            <button class="admin-tab" onclick="switchAdminTab('bookings')">Global Bookings</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="adminLogout()" style="padding: 8px 16px;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Movies Management Tab -->
+            <div id="admin-movies" class="admin-content">
+                <div class="admin-actions">
+                    <button class="btn btn-primary" onclick="openAddMovieForm()">
+                        <i class="fas fa-plus"></i> Add New Movie
+                    </button>
+                </div>
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Poster</th>
+                                <th>Title</th>
+                                <th>Language</th>
+                                <th>Rating</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminMoviesList">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Global Bookings Tab -->
+            <div id="admin-bookings" class="admin-content" style="display:none;">
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Movie</th>
+                                <th>Details</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminBookingsList">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MOVIE MODAL (CRUD) ===== -->
+    <div id="movieModal" class="modal-overlay" style="display:none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="movieModalTitle">Add New Movie</h3>
+                <button class="btn-close" onclick="closeMovieModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="movieForm">
+                    <input type="hidden" id="editMovieId">
+                    <div class="form-group">
+                        <label>Movie Title</label>
+                        <input type="text" id="movieFormTitle" class="form-control" placeholder="e.g. Inception"
+                            required>
+                    </div>
+                    <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="form-group">
+                            <label>Language</label>
+                            <select id="movieFormLang" class="form-control">
+                                <option value="ta">Tamil</option>
+                                <option value="hi">Hindi</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Rating (0-10)</label>
+                            <input type="number" id="movieFormRating" class="form-control" step="0.1" min="0" max="10"
+                                placeholder="8.5">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Poster URL</label>
+                        <input type="url" id="movieFormPoster" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Backdrop URL</label>
+                        <input type="url" id="movieFormBackdrop" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Overview</label>
+                        <textarea id="movieFormOverview" class="form-control" rows="3"
+                            placeholder="Movie plot summary..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeMovieModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveMovie()">Save Movie</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer id="appFooter">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-film"></i> CineVerse
+            </div>
+            <div class="footer-links">
+                <a href="#" onclick="showSampleTicket()">Sample Ticket</a>
+                <span class="footer-divider">|</span>
+                <a href="#" onclick="navigate('admin')" class="admin-link"><i class="fas fa-lock"></i> Admin Portal</a>
+            </div>
+            <div class="footer-bottom"
+                style="width:100%; text-align:center; margin-top:20px; color:var(--text-muted); font-size:0.8rem;">
+                &copy; 2026 CineVerse. All rights reserved. Made with ❤️
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js?v=4"></script>
+</body>
+
+</html>
+
+</html>
